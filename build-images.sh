@@ -11,24 +11,24 @@ set -e
 # Prepare variables for later use
 images=()
 # The image will be pushed to GitHub container registry
-repobase="${REPOBASE:-ghcr.io/nethserver}"
+repobase="${REPOBASE:-ghcr.io/epetersen-lab}"
 # Configure the image name
-reponame="kickstart"
+reponame="testmodule"
 
 # Create a new empty container image
 container=$(buildah from scratch)
 
-# Reuse existing nodebuilder-kickstart container, to speed up builds
-if ! buildah containers --format "{{.ContainerName}}" | grep -q nodebuilder-kickstart; then
+# Reuse existing nodebuilder-testmodule container, to speed up builds
+if ! buildah containers --format "{{.ContainerName}}" | grep -q nodebuilder-testmodule; then
     echo "Pulling NodeJS runtime..."
-    buildah from --name nodebuilder-kickstart -v "${PWD}:/usr/src:Z" docker.io/library/node:22.16.0-slim
+    buildah from --name nodebuilder-testmodule -v "${PWD}:/usr/src:Z" docker.io/library/node:22.16.0-slim
 fi
 
 echo "Build static UI files with node..."
 buildah run \
     --workingdir=/usr/src/ui \
     --env="NODE_OPTIONS=--openssl-legacy-provider" \
-    nodebuilder-kickstart \
+    nodebuilder-testmodule \
     sh -c "yarn install && yarn build"
 
 # Add imageroot directory to the container image
